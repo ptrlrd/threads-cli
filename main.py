@@ -7,17 +7,19 @@ import os
 from rich.console import Console
 from rich.table import Table
 from datetime import datetime, timedelta, timezone
+from dotenv import load_dotenv
 
 app = typer.Typer()
 console = Console()
+load_dotenv()  # load environment variables from .env file
 
-ACCESS_TOKEN = ""
+ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
 BASE_URL = "https://graph.threads.net/v1.0"
-
 HEADERS = {
     'Authorization': f'Bearer {ACCESS_TOKEN}'
 }
 DRAFTS_FILE = 'drafts.json'
+SERVER_PROCESS_TIME = 10
 
 def get_user_id():
     response = requests.get(f"{BASE_URL}/me?fields=id", headers=HEADERS)
@@ -227,7 +229,7 @@ def create_text_post(text: str):
     container_id = response.json()['id']
 
     # Wait for the server to process the upload
-    time.sleep(30)
+    time.sleep(SERVER_PROCESS_TIME)
 
     publish_payload = {
         "creation_id": container_id
@@ -253,7 +255,7 @@ def create_image_post(text: str, image_url: str):
     container_id = response.json()['id']
 
     # Wait for the server to process the upload
-    time.sleep(30)
+    time.sleep(SERVER_PROCESS_TIME)
 
     publish_payload = {
         "creation_id": container_id
@@ -309,7 +311,7 @@ def send_reply(media_id: str, text: str):
     container_id = response.json()['id']
 
     # Wait for the server to process the upload
-    time.sleep(30)
+    time.sleep(SERVER_PROCESS_TIME)
 
     publish_payload = {
         "creation_id": container_id
@@ -420,6 +422,52 @@ def send_draft(draft_id: int):
 
     typer.echo(f"Draft with ID {draft_id} sent and removed from drafts.")
 
+def get_post_replies_count(post_id):
+    """
+    Retrieve the number of replies for a specific post.
+    """
+    response = requests.get(f"{BASE_URL}/{post_id}/replies", headers=HEADERS)
+    response.raise_for_status()
+    replies = response.json().get('data', [])
+    return len(replies)
+
+
+@app.command()
+def get_recent_posts(limit: int = 5):
+    """
+    Retrieve the most recent posts.
+    """
+    user_id = get_user_id()
+    fields = "id,media_product_type,media_type,media_url,permalink,owner,username,text,timestamp,shortcode,thumbnail_url,children,is_quote_post"
+    response = requests.get(f"{BASE_URL}/{user_id}/threads?fields={fields}&limit={limit}", headers=HEADERS)
+    response.raise_for_status()
+    posts = response.json().get('data', [])
+
+    table = Table(title="Recent Posts")
+    table.add_column("ID", style="cyan", no_wrap=True)
+    table.add_column("Username", style="cyan", no_wrap=True)
+    table.add_column("Timestamp", style="magenta")
+    table.add_column("Type", style="green")
+    table.add_column("Text", style="yellow")
+    table.add_column("Permalink", style="blue")
+    table.add_column("Replies", style="red")
+
+    for post in posts:
+        if post.get('media_type') == 'REPOST_FACADE':
+            continue
+        timestamp = convert_to_locale(post.get('timestamp', 'N/A'))
+        replies_count = get_post_replies_count(post['id'])
+        table.add_row(
+            post.get('id', 'N/A'),
+            post.get('username', 'N/A'),
+            timestamp,
+            post.get('media_type', 'N/A'),
+            post.get('text', 'N/A'),
+            post.get('permalink', 'N/A'),
+            str(replies_count)
+        )
+
+    console.print(table)
 
 if __name__ == "__main__":
     app()
