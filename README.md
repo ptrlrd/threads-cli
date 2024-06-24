@@ -38,67 +38,67 @@ library for pretty-printing tables.
 1. **Get Profile Information:**
     Retrieve and display user profile information, including the last post made by the user.
     ```bash
-    python main.py get_profile
+    python main.py get-profile
     ```
 
 2. **Get Recent Posts:**
     Retrieve the most recent posts.
     ```bash
-    python main.py get_recent_posts --limit 5
+    python main.py get-recent-posts --limit 5
     ```
 
 3. **Get Top Liked Posts:**
     Retrieve the top liked posts of all time or within a specific time range.
     ```bash
-    python main.py get_top_liked_posts --limit 5 --time-range 2w
+    python main.py get-top-liked-posts --limit 5 --time-range 2w
     ```
 
 4. **Create a Text Post:**
     Create a post with text.
     ```bash
-    python main.py create_text_post "This is a text post."
+    python main.py create-text-post "This is a text post."
     ```
 
 5. **Create an Image Post:**
     Create a post with an image.
     ```bash
-    python main.py create_image_post "This is an image post." "https://example.com/image.jpg"
+    python main.py create-image_post "This is an image post." "https://example.com/image.jpg"
     ```
 
 6. **Get Latest Replies:**
     Retrieve the latest replies for a specific media post.
     ```bash
-    python main.py get_latest_replies --media-id <media_id> --limit 5
+    python main.py get-latest-replies --media-id <media_id> --limit 5
     ```
 
 7. **Send a Reply:**
     Send a reply to a specific media post.
     ```bash
-    python main.py send_reply --media-id <media_id> --text "This is a reply."
+    python main.py send-reply --media-id <media_id> --text "This is a reply."
     ```
 
 8. **Schedule a Post:**
     Schedule a post with text at a specific time.
     ```bash
-    python main.py schedule_post --text "This is a scheduled post." --post-time "2024-06-22 23:22:00"
+    python main.py schedule-post --text "This is a scheduled post." --post-time "2024-06-22 23:22:00"
     ```
 
 9. **Create a Draft:**
     Create a draft with text.
     ```bash
-    python main.py create_draft "This is a draft."
+    python main.py create-draft "This is a draft."
     ```
 
 10. **Get Drafts:**
     Retrieve all drafts.
     ```bash
-    python main.py get_drafts
+    python main.py get-drafts
     ```
 
 11. **Send a Draft:**
     Send a draft with a specific ID and remove it from drafts.
     ```bash
-    python main.py send_draft --draft-id 1
+    python main.py send-draft --draft-id 1
     ```
 
 ## Additional Information
