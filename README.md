@@ -34,6 +34,8 @@ library for pretty-printing tables.
 ## Usage
 
 ### Commands
+If any of these example commands are incorrect, if you do `python main.py --help` you will see the list of commands and their descriptions.
+
 
 1. **Get Profile Information:**
     Retrieve and display user profile information, including the last post made by the user.
