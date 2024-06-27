@@ -242,12 +242,12 @@ def schedule_post(text: str, post_time: str):
     typer.echo(f"Post scheduled for {post_time} with text: '{text}'")
 
 @app.command()
-def create_draft(text: str):
-    """
-    Create a draft with text.
-    """
-    if os.path.exists(DRAFTS_FILE):
-        with open(DRAFTS_FILE, 'r') as file:
+def create_draft(text: str, drafts_file: str = DRAFTS_FILE):
+    '''
+    Create a draft with the given text and save it to the drafts file.
+    '''
+    if os.path.exists(drafts_file):
+        with open(drafts_file, 'r') as file:
             drafts = json.load(file)
     else:
         drafts = []
@@ -261,21 +261,21 @@ def create_draft(text: str):
     }
     drafts.append(draft)
 
-    with open(DRAFTS_FILE, 'w') as file:
+    with open(drafts_file, 'w') as file:
         json.dump(drafts, file, indent=4)
 
     typer.echo(f"Draft created with ID: {next_id}")
 
 @app.command()
-def get_drafts():
-    """
-    Retrieve all drafts.
-    """
-    if not os.path.exists(DRAFTS_FILE):
+def get_drafts(drafts_file: str = DRAFTS_FILE):
+    '''
+    Get all drafts from the drafts file.
+    '''
+    if not os.path.exists(drafts_file):
         typer.echo("No drafts found.")
         return
 
-    with open(DRAFTS_FILE, 'r') as file:
+    with open(drafts_file, 'r') as file:
         drafts = json.load(file)
 
     table = Table(title="Drafts")
@@ -293,28 +293,28 @@ def get_drafts():
     console.print(table)
 
 @app.command()
-def send_draft(draft_id: int):
-    """
-    Sends a draft with a specific ID and removes it from drafts.
-    """
-    if not os.path.exists(DRAFTS_FILE):
+def send_draft(draft_id: int, drafts_file: str = DRAFTS_FILE):
+    '''
+    Send a draft with the given ID and remove it from the drafts file.
+    '''
+    if not os.path.exists(drafts_file):
         typer.echo("No drafts found.")
-        return
+        raise typer.Exit(1)
 
-    with open(DRAFTS_FILE, 'r') as file:
+    with open(drafts_file, 'r') as file:
         drafts = json.load(file)
 
     draft = next((draft for draft in drafts if draft['id'] == draft_id), None)
 
     if draft is None:
         typer.echo(f"Draft with ID {draft_id} not found.")
-        return
+        raise typer.Exit(1)
 
     create_text_post(draft['text'])
 
     drafts = [draft for draft in drafts if draft['id'] != draft_id]
 
-    with open(DRAFTS_FILE, 'w') as file:
+    with open(drafts_file, 'w') as file:
         json.dump(drafts, file, indent=4)
 
     typer.echo(f"Draft with ID {draft_id} sent and removed from drafts.")
